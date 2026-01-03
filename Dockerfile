@@ -41,22 +41,23 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app .
-
-RUN groupadd -g 1000 jackett && \
-    useradd -u 1000 -g jackett -s /bin/bash -m jackett && \
-    mkdir -p /config && \
-    chown -R jackett:jackett /app /config && \
+# Créer le répertoire config avec permissions larges
+RUN mkdir -p /config && \
     chmod -R 777 /config
 
-USER jackett
+# Script d'entrypoint pour gérer PUID/PGID
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 9117
 
 ENV XDG_CONFIG_HOME=/config
 ENV XDG_DATA_HOME=/config
+ENV PUID=1000
+ENV PGID=1000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:9117/UI/Dashboard || exit 1
 
-ENTRYPOINT ["dotnet", "jackett.dll"]
-CMD ["--NoRestart", "--NoUpdates", "--DataFolder=/config"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["dotnet", "/app/jackett.dll", "--NoRestart", "--NoUpdates", "--DataFolder=/config"]
