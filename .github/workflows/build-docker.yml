@@ -7,7 +7,6 @@ on:
 
 env:
   JACKETT_REPO: Jackett/Jackett
-  YGGTORRENT_FILE_URL: https://raw.githubusercontent.com/becauseIMBaatmaan/Jackett/refs/heads/yggtorrent-delay/src/Jackett.Common/Indexers/Definitions/YggTorrent.cs
 
 jobs:
   build-and-push:
@@ -42,11 +41,10 @@ jobs:
           cd jackett-repo
           echo "JACKETT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo 'latest')" >> $GITHUB_ENV
 
-      - name: Download and add custom YggTorrent file
+      - name: Add custom YggTorrent file
         run: |
           mkdir -p jackett-repo/src/Jackett.Common/Indexers/Definitions
-          curl -fSL -o jackett-repo/src/Jackett.Common/Indexers/Definitions/YggTorrent.cs \
-            ${{ env.YGGTORRENT_FILE_URL }}
+          cp YggTorrent.cs jackett-repo/src/Jackett.Common/Indexers/Definitions/
           echo "YggTorrent.cs file added successfully"
 
       - name: Copy Dockerfile to Jackett repository
