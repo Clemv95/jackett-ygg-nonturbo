@@ -90,4 +90,5 @@ Une fois le conteneur démarré :
   - Ajout / modification de trackers
   - Gestion des clés API
   - Paramètres avancés (cache, logs, etc.)
+- Ajouter Indexer YGGTorrent
 Pour sauvegarder ou migrer la configuration, il suffit de sauvegarder le dossier `/<host_folder_config>` utilisé dans les volumes.
