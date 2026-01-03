@@ -663,6 +663,13 @@ namespace Jackett.Common.Indexers.Definitions
                 keywords = _StripSeasonRegex.Replace(keywords, "");
             }
 
+            if (GetRemoveYearTitleEnabled())
+            {
+                keywords = Regex.Replace(keywords, @"\s*\(\d{4}\)\s*$", "").Trim();
+                keywords = Regex.Replace(keywords, @"\s*\[\d{4}\]\s*$", "").Trim();
+                keywords = Regex.Replace(keywords, @"\s+\d{4}\s*$", "").Trim();
+            }
+
             keywords = keywords.Trim();
 
             keywords = _QuoteWordsRegex.Replace(keywords, "\"$1\"");
@@ -956,11 +963,6 @@ namespace Jackett.Common.Indexers.Definitions
             if (GetFilterTitleEnabled())
             {
                 t = NormalizeTitleWithYear(t);
-            }
-
-            if (GetRemoveYearTitleEnabled())
-            {
-                t = Regex.Replace(title, @"\s*[\(\[]\d{4}[\)\]]\s*$", "").Trim();;
             }
 
             if (GetVostfrEnabled())
