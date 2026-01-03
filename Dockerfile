@@ -42,8 +42,13 @@ RUN apt-get update && \
 
 COPY --from=build /app .
 
-RUN mkdir -p /config && \
+RUN groupadd -g 1000 jackett && \
+    useradd -u 1000 -g jackett -s /bin/bash -m jackett && \
+    mkdir -p /config && \
+    chown -R jackett:jackett /app /config && \
     chmod 777 /config
+
+USER jackett
 
 EXPOSE 9117
 
