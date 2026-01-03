@@ -146,6 +146,7 @@ namespace Jackett.Common.Indexers.Definitions
         private const string CfgMultiLanguageValue = "multilanguage";
         private const string CfgVostfr = "vostfr";
         private const string CfgFilterTitle = "filter_title";
+        private const string CfgRemoveYearTitle = "remove_year_title";
         private const string CfgStripSeason = "strip_season";
         private const string CfgEnhancedAnime = "enhancedAnime";
         private const string CfgEnhancedAnime4 = "enhancedAnime4";
