@@ -162,6 +162,7 @@ namespace Jackett.Common.Indexers.Definitions
         private string _cachedMultiLangValue;
         private bool? _cachedVostfr;
         private bool? _cachedFilterTitle;
+        private bool? _removeYearTitle;
         private bool? _cachedStripSeason;
         private bool? _cachedEnhancedAnime;
         private bool? _cachedEnhancedAnime4;
