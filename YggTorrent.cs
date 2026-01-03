@@ -243,7 +243,7 @@ namespace Jackett.Common.Indexers.Definitions
                 CfgRemoveYearTitle,
                 new BoolConfigurationItem("Remove Year in Title to enhance search for Movies")
                 {
-                    Value = false
+                    Value = true
                 });
 
 
@@ -535,9 +535,10 @@ namespace Jackett.Common.Indexers.Definitions
 
             if (GetRemoveYearTitleEnabled())
             {
+                var beforeYear = rawQuery;
                 rawQuery = Regex.Replace(rawQuery, @"\s*\(\d{4}\)\s*$", "").Trim();
                 rawQuery = Regex.Replace(rawQuery, @"\s*\[\d{4}\]\s*$", "").Trim();
-                rawQuery = Regex.Replace(rawQuery, @"\s+\d{4}\s*$", "").Trim();
+                rawQuery = Regex.Replace(rawQuery, @"\s+\d{4}$", "").Trim();
             }
 
             var keywords = BuildKeywordsFromRaw(rawQuery);
