@@ -533,6 +533,13 @@ namespace Jackett.Common.Indexers.Definitions
 
             rawQuery = NormalizeFrenchSeasonInRawQuery(rawQuery);
 
+            if (GetRemoveYearTitleEnabled())
+            {
+                rawQuery = Regex.Replace(rawQuery, @"\s*\(\d{4}\)\s*$", "").Trim();
+                rawQuery = Regex.Replace(rawQuery, @"\s*\[\d{4}\]\s*$", "").Trim();
+                rawQuery = Regex.Replace(rawQuery, @"\s+\d{4}\s*$", "").Trim();
+            }
+
             var keywords = BuildKeywordsFromRaw(rawQuery);
 
             var order = ((SingleSelectConfigurationItem)configData.GetDynamic(CfgOrder)).Value;
@@ -661,13 +668,6 @@ namespace Jackett.Common.Indexers.Definitions
             if (GetStripSeasonEnabled())
             {
                 keywords = _StripSeasonRegex.Replace(keywords, "");
-            }
-
-            if (GetRemoveYearTitleEnabled())
-            {
-                keywords = Regex.Replace(keywords, @"\s*\(\d{4}\)\s*$", "").Trim();
-                keywords = Regex.Replace(keywords, @"\s*\[\d{4}\]\s*$", "").Trim();
-                keywords = Regex.Replace(keywords, @"\s+\d{4}\s*$", "").Trim();
             }
 
             keywords = keywords.Trim();
