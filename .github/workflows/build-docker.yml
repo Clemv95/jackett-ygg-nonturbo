@@ -52,6 +52,7 @@ jobs:
       - name: Copy Dockerfile to Jackett repository
         run: |
           cp Dockerfile jackett-repo/
+          cp entrypoint.sh jackett-repo/
 
       - name: Extract metadata for Docker
         id: meta
