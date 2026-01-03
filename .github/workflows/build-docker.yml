@@ -1,0 +1,81 @@
+name: Build Custom Jackett Docker Image
+
+on:
+  schedule:
+    - cron: '0 9 * * *' 
+  workflow_dispatch:  
+
+env:
+  JACKETT_REPO: Jackett/Jackett
+  YGGTORRENT_FILE_URL: https://raw.githubusercontent.com/becauseIMBaatmaan/Jackett/refs/heads/yggtorrent-delay/src/Jackett.Common/Indexers/Definitions/YggTorrent.cs
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone Jackett repository
+        run: |
+          git clone https://github.com/${{ env.JACKETT_REPO }}.git jackett-repo
+          cd jackett-repo
+          echo "JACKETT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo 'latest')" >> $GITHUB_ENV
+
+      - name: Download and add custom YggTorrent file
+        run: |
+          mkdir -p jackett-repo/src/Jackett.Common/Indexers/Definitions
+          curl -fSL -o jackett-repo/src/Jackett.Common/Indexers/Definitions/YggTorrent.cs \
+            ${{ env.YGGTORRENT_FILE_URL }}
+          echo "YggTorrent.cs file added successfully"
+
+      - name: Copy Dockerfile to Jackett repository
+        run: |
+          cp Dockerfile jackett-repo/
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/jackett-ygg-nonturbo
+            ghcr.io/${{ github.repository_owner }}/jackett-ygg-nonturbo
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.JACKETT_VERSION }}
+            type=raw,value={{date 'YYYYMMDD'}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./jackett-repo
+          file: ./jackett-repo/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo ${{ steps.meta.outputs.digest }}
